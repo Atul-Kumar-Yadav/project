@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .profile-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border 0.3s;
+        }
+
+        select:focus, input:focus {
+            border: 2px solid #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .id-card {
+            display: none;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #007BFF;
+            border-radius: 8px;
+            text-align: left;
+            background-color: #e9f7ff;
+        }
+
+        .id-card p {
+            margin: 8px 0;
+        }
+
+        .button-group {
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2>Details</h2>
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="designation">Designation:</label>
+                <select id="designation" name="designation" required onchange="toggleFields()">
+                    <option value="" disabled selected>Select your designation</option>
+                    <option value="HOD">HOD</option>
+                    <option value="HR">HR</option>
+                    <option value="Employee">Employee</option>
+                </select>
+            </div>
+
+            <div id="hodFields" class="form-group hidden">
+                <label for="hodName">HOD Name:</label>
+                <input type="text" id="hodName" name="hodName" placeholder="Enter your name">
+                <label for="hodDept">HOD Department:</label>
+                <input type="text" id="hodDept" name="hodDept" placeholder="Enter your department">
+            </div>
+
+            <div id="hrFields" class="form-group hidden">
+                <label for="hrName">HR Name:</label>
+                <input type="text" id="hrName" name="hrName" placeholder="Enter your name">
+                <label for="hrDept">HR Department:</label>
+                <input type="text" id="hrDept" name="hrDept" placeholder="Enter your department">
+                <label for="hrHod">HOD Name:</label>
+                <input type="text" id="hrHod" name="hrHod" placeholder="Enter your HOD's name">
+                <label for="currentProject">Current Project:</label>
+                <input type="text" id="currentProject" name="currentProject" placeholder="Enter current project">
+            </div>
+
+            <div id="employeeFields" class="form-group hidden">
+                <label for="empName">Employee Name:</label>
+                <input type="text" id="empName" name="empName" placeholder="Enter your name">
+                <label for="empDept">Department:</label>
+                <input type="text" id="empDept" name="empDept" placeholder="Enter your department">
+                <label for="empHr">HR Name:</label>
+                <input type="text" id="empHr" name="empHr" placeholder="Enter your HR's name">
+                <label for="empDesignation">Designation:</label>
+                <input type="text" id="empDesignation" name="empDesignation" placeholder="Enter your designation">
+                <label for="joiningDate">Joining Date:</label>
+                <input type="date" id="joiningDate" name="joiningDate">
+                <label for="currentProject">Current Project:</label>
+                <input type="text" id="currentProjectEmp" name="currentProjectEmp" placeholder="Enter current project">
+            </div>
+
+            <button type="button" id="saveBtn" onclick="saveProfile()">Save</button>
+            <button type="button" id="addDataBtn" class="hidden" onclick="expandFields()">Add Data</button>
+            <button type="button" id="wishToChangeBtn" onclick="wishToChange()" class="hidden">Wish to Change?</button>
+        </form>
+
+        <div class="id-card" id="idCard">
+            <p><strong>Designation:</strong> <span id="cardDesignation"></span></p>
+            <p><strong>Name:</strong> <span id="cardName"></span></p>
+            <p><strong>Department:</strong> <span id="cardDepartment"></span></p>
+            <p id="cardAdditional"></p>
+        </div>
+
+        <div class="search-container" id="searchContainer">
+            <h3 id="searchTitle"></h3>
+            <input type="text" id="searchField" placeholder="Search by name">
+            <button type="button" onclick="searchData()">Search</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleFields() {
+            const designation = document.getElementById('designation').value;
+            document.getElementById('hodFields').classList.add('hidden');
+            document.getElementById('hrFields').classList.add('hidden');
+            document.getElementById('employeeFields').classList.add('hidden');
+            document.getElementById('searchContainer').style.display = 'none';
+
+            if (designation === 'HOD') {
+                document.getElementById('hodFields').classList.remove('hidden');
+                document.getElementById('searchTitle').textContent = 'Find HR or Employee';
+                document.getElementById('searchContainer').style.display = 'block';
+            } else if (designation === 'HR') {
+                document.getElementById('hrFields').classList.remove('hidden');
+                document.getElementById('searchTitle').textContent = 'Find Employee';
+                document.getElementById('searchContainer').style.display = 'block';
+            } else if (designation === 'Employee') {
+                document.getElementById('employeeFields').classList.remove('hidden');
+            }
+        }
+
+        function saveProfile() {
+            const designation = document.getElementById('designation').value;
+            const name = designation === 'HOD' ? document.getElementById('hodName').value : 
+                         designation === 'HR' ? document.getElementById('hrName').value : 
+                         document.getElementById('empName').value;
+            const department = designation === 'HOD' ? document.getElementById('hodDept').value :
+                               designation === 'HR' ? document.getElementById('hrDept').value :
+                               document.getElementById('empDept').value;
+
+            let additionalInfo = '';
+
+            if (designation === 'HR') {
+                const currentProject = document.getElementById('currentProject').value;
+                additionalInfo = `<strong>Current Project:</strong> ${currentProject}`;
+            } else if (designation === 'Employee') {
+                const hr = document.getElementById('empHr').value;
+                const empDesignation = document.getElementById('empDesignation').value;
+                const joiningDate = document.getElementById('joiningDate').value;
+                const currentProject = document.getElementById('currentProjectEmp').value;
+                additionalInfo = `<strong>HR:</strong> ${hr}<br><strong>Designation:</strong> ${empDesignation}<br><strong>Joining Date:</strong> ${joiningDate}<br><strong>Current Project:</strong> ${currentProject}`;
+            }
+
+            document.getElementById('cardDesignation').textContent = designation;
+            document.getElementById('cardName').textContent = name;
+            document.getElementById('cardDepartment').textContent = department;
+            document.getElementById('cardAdditional').innerHTML = additionalInfo;
+            document.getElementById('idCard').style.display = 'block';
+
+            document.getElementById('profileForm').classList.add('hidden');
+            document.getElementById('addDataBtn').classList.remove('hidden');
+            document.getElementById('wishToChangeBtn').classList.remove('hidden');
+        }
+
+        function expandFields() {
+            document.getElementById('profileForm').classList.remove('hidden');
+            document.getElementById('addDataBtn').classList.add('hidden');
+        }
+
+        function wishToChange() {
+            alert("Redirecting to Change Project Form...");
+            window.location.href = '/change-project-form';
+        }
+
+        function searchData() {
+            const searchValue = document.getElementById('searchField').value;
+            alert(`Search functionality to be implemented for: ${searchValue}`);
+        }
+    </script>
+</body>
+</html>

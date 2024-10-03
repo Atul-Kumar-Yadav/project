@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Transfer Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            margin-bottom: 20px;
+            font-size: 28px; /* Enlarged heading */
+            color: #007BFF;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%; /* Ensure the input fields take full width */
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border: 2px solid #007BFF;
+            outline: none;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-container button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0; /* No extra padding */
+            width: 40px; /* Clickable area of 40px */
+            height: 40px; /* Same height as input */
+            line-height: 0; /* Remove line height */
+            color: #007BFF; /* Button text color */
+            font-size: 14px; /* Button text size */
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .forgot-password {
+            margin-top: 10px;
+        }
+
+        .register-button {
+            margin-top: 10px;
+            background-color: #007BFF; /* Same color as login */
+        }
+
+        .register-button:hover {
+            background-color: #0056b3; /* Same hover effect as login */
+        }
+    </style>
+</head>
+<body onload="setFocus()">
+    <div class="login-container" role="form" aria-labelledby="login-header">
+        <h1 id="login-header">Employee Transfer Management System</h1>
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                    <button type="button" id="toggle-password" onclick="togglePasswordVisibility()">View</button>
+                </div>
+            </div>
+         <!-- <a href="next.html"><button type="submit" class="register-button">Login</button></a>  -->
+         
+         <a href="next.html"><button type="button" class="register-button" onclick="window.location.href='/register'">LOGIN</button></a>
+         <a href="register.html"><button type="button" class="register-button" onclick="window.location.href='/register'">REGISTER</button></a>
+            <p class="forgot-password"><a href="/forgot-password">Forgot Password?</a></p>
+        </form>
+    </div>
+
+    <script>
+        function setFocus() {
+            document.getElementById('username').focus(); // Set focus on the username input
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const button = document.getElementById('toggle-password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                button.textContent = 'Hide'; // Change button text to Hide
+            } else {
+                passwordInput.type = 'password';
+                button.textContent = 'View'; // Change button text to View
+            }
+        }
+    </script>
+</body>
+</html>
