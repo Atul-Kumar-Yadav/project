@@ -11,6 +11,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+function isAuthenticated(req, res, next) {
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+    next();
+}
+
 
 // View Engine Setup
 app.set("views", path.join(__dirname, "views"));
@@ -53,11 +60,46 @@ app.get("/", (req, res) => {
 app.get("/begin", (req, res) => {
     res.render("begin");
 });
+// 🔹 Route to Serve the Login Page
+app.get("/login", (req, res) => {
+    res.render("login"); // Make sure you have a file named 'login.ejs' in the views folder
+});
 
 // 🔹 Login Page
-app.get("/login", (req, res) => {
-    res.render("login", { error: null });
+// 🔹 Handle Login POST Request
+// 🔹 Handle Login POST Request
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Find the employee by name (username)
+        const employee = await Employee.findOne({ name: username });
+
+        // If employee not found or password doesn't match
+        if (!employee || employee.password !== password) {
+            return res.render("login", { error: "Invalid credentials" });
+        }
+
+        // If login is successful, save user in session
+        req.session.user = employee;
+
+        // Render the next.ejs page with required data
+        res.render("next", {
+            title: "Enter Profile",
+            designation: employee.designation || "",
+            name: employee.name || "",
+            department: employee.department || ""
+        });
+    } catch (error) {
+        console.error("❌ Error logging in:", error);
+        res.render("login", { error: "Internal Server Error" });
+    }
 });
+
+app.get("/enter-profile", isAuthenticated, (req, res) => {
+    res.render("next", { title: "Enter Profile", designation: "", name: "", department: "" });
+});
+
 
 // 🔹 Registration Page
 app.get("/register", (req, res) => {
@@ -65,19 +107,23 @@ app.get("/register", (req, res) => {
 });
 
 // 🔹 Registration POST Route
+// 🔹 Registration POST Route
 app.post("/register", async (req, res) => {
     try {
-        const { name, department, designation, hrName, joiningDate, currentProject } = req.body;
+        const { name, department, designation, hrName, joiningDate, currentProject, password } = req.body;
 
-        if (!name || !department || !designation) {
+        // Check if all required fields are filled
+        if (!name || !department || !designation || !password) {
             return res.render("register", { error: "All fields are required" });
         }
 
+        // Check if the employee already exists
         const existingEmployee = await Employee.findOne({ name });
         if (existingEmployee) {
             return res.render("register", { error: "Employee already exists!" });
         }
 
+        // Create a new employee
         const newEmployee = new Employee({
             name,
             department,
@@ -85,8 +131,10 @@ app.post("/register", async (req, res) => {
             hrName: hrName || "N/A",
             joiningDate: joiningDate || new Date(),
             currentProject: currentProject || "N/A",
+            password
         });
 
+        // Save the employee to MongoDB
         await newEmployee.save();
         res.redirect("/login");
     } catch (error) {
@@ -95,30 +143,6 @@ app.post("/register", async (req, res) => {
     }
 });
 
-// 🔹 Login POST Route
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-
-    // Dummy authentication (Replace this with real database validation)
-    if (username === "admin" && password === "1234") {
-        req.session.user = username;
-        return res.redirect("/enter-profile");
-    } else {
-        return res.render("login", { error: "Invalid credentials" });
-    }
-});
-
-// 🔹 Logout Route
-app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/login");
-    });
-});
-
-// 🔹 Employee Profile Entry (Protected Route)
-app.get("/enter-profile", isAuthenticated, (req, res) => {
-    res.render("next", { title: "Enter Profile", designation: "", name: "", department: "" });
-});
 
 // 🔹 Save Employee Profile
 app.post("/save-profile", isAuthenticated, async (req, res) => {
@@ -126,8 +150,16 @@ app.post("/save-profile", isAuthenticated, async (req, res) => {
     
     let { name, department, designation, hrName, joiningDate, currentProject } = req.body;
 
+    if (Array.isArray(name)) {
+        name = name.find(n => n.trim() !== "") || "N/A";
+    }
+
     if (Array.isArray(designation)) {
         designation = designation[0]; // Ensure it's a single value
+    }
+
+    if (Array.isArray(currentProject)) {
+        currentProject = currentProject.filter(cp => cp.trim() !== "").join(", ") || "N/A";
     }
 
     if (!name || !department || !designation) {
@@ -141,7 +173,7 @@ app.post("/save-profile", isAuthenticated, async (req, res) => {
             designation,
             hrName: hrName || "N/A",
             joiningDate: joiningDate || new Date(),
-            currentProject: currentProject || "N/A",
+            currentProject
         });
 
         await newEmployee.save();
@@ -149,23 +181,6 @@ app.post("/save-profile", isAuthenticated, async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error saving profile:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-});
-
-// 🔹 Search Employee Profile
-app.get("/search-profile", async (req, res) => {
-    try {
-        const searchName = req.query.name;
-        const employee = await Employee.findOne({ name: new RegExp(searchName, "i") });
-
-        if (employee) {
-            res.json({ success: true, data: employee });
-        } else {
-            res.json({ success: false, message: "Profile not found" });
-        }
-    } catch (error) {
-        console.error("❌ Error searching profile:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
@@ -178,8 +193,55 @@ app.get("/employees", isAuthenticated, async (req, res) => {
     } catch (error) {
         console.error("❌ Error fetching employees:", error);
         res.status(500).send("Internal Server Error");
-    }
+    }   
 });
+app.post('/save-profile', (req, res) => {
+    const { designation, name, department, hodName, currentProject, joiningDate } = req.body;
+
+    // Save the data to MongoDB (or any other database)
+    const newProfile = new Profile({
+        designation,
+        name,
+        department,
+        hodName,
+        currentProject,
+        joiningDate
+    });
+
+    newProfile.save()
+        .then(() => {
+            // Redirect to the saved details page
+            res.render('savedDetails', {
+                designation,
+                name,
+                department,
+                hodName,
+                currentProject,
+                joiningDate
+            });
+        })
+        .catch(err => {
+            console.error("Error saving profile:", err);
+            res.status(500).send("Error saving profile.");
+        });
+});
+app.post("/save-and-display", (req, res) => {
+    const { designation, name, department, hodName, currentProject, joiningDate } = req.body;
+    
+    // Save the details to your database (example with MongoDB, adjust as needed)
+    const profile = {
+        designation,
+        name,
+        department,
+        hodName,
+        currentProject,
+        joiningDate
+    };
+
+    // After saving, redirect to the Details Saved page with the details
+    res.render("savedDetails", { profile });
+});
+
 
 // Start Server
 app.listen(8080, () => {

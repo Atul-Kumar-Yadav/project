@@ -8,21 +8,31 @@
 </head>
 <body>
     <div class="container">
-       <form action="/register" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
+        <form action="/register" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department" required>
+        
+            <label for="designation">Designation:</label>
+            <input type="text" id="designation" name="designation" required>
+        
+            <label for="hrName">HR Name:</label>
+            <input type="text" id="hrName" name="hrName">
+        
+            <label for="joiningDate">Joining Date:</label>
+            <input type="date" id="joiningDate" name="joiningDate">
+        
+            <label for="currentProject">Current Project:</label>
+            <input type="text" id="currentProject" name="currentProject">
+        
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
-            
+        
             <button type="submit">Register</button>
         </form>
+        
         <p>Already have an account? <a href="/login">Login here</a></p>
     </div>
 </body>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details Saved</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="profile-container">
+        <h2>Details Saved Successfully</h2>
+        <h3>Details of <%= profile.designation %></h3>
+        <ul>
+            <% if (profile.name) { %>
+                <li><strong>Name:</strong> <%= profile.name %></li>
+            <% } %>
+            <% if (profile.department) { %>
+                <li><strong>Department:</strong> <%= profile.department %></li>
+            <% } %>
+            <% if (profile.hodName) { %>
+                <li><strong>HOD Name:</strong> <%= profile.hodName %></li>
+            <% } %>
+            <% if (profile.currentProject) { %>
+                <li><strong>Current Project:</strong> <%= profile.currentProject %></li>
+            <% } %>
+            <% if (profile.joiningDate) { %>
+                <li><strong>Joining Date:</strong> <%= profile.joiningDate %></li>
+            <% } %>
+        </ul>
+        <a href="/enter-profile">Go Back to Enter More Details</a>
+    </div>
+</body>
+</html>

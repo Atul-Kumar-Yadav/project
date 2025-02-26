@@ -11,19 +11,14 @@
         <h2>Details of <%= designation %></h2>
 
         <!-- Search Field -->
-        <div class="search-container">
-            <input type="text" id="searchField" placeholder="Search by Name">
-            <button type="button" onclick="searchData()">Search</button>
-        </div>
 
-        <!-- Search Result Display -->
-        <div id="searchResult"></div>
 
-        <form id="profileForm">
+        <!-- Compact Form -->
+        <form id="profileForm" action="/save-and-display" method="POST">
             <div class="form-group">
                 <label for="designation">Designation:</label>
                 <select id="designation" name="designation" required onchange="toggleFields()">
-                    <option value="" disabled selected>Select your designation</option>
+                    <option value="" disabled selected>Select Designation</option>
                     <option value="HOD" <%= designation === 'HOD' ? 'selected' : '' %>>HOD</option>
                     <option value="HR" <%= designation === 'HR' ? 'selected' : '' %>>HR</option>
                     <option value="Employee" <%= designation === 'Employee' ? 'selected' : '' %>>Employee</option>
@@ -32,39 +27,28 @@
 
             <!-- HOD Fields -->
             <div id="hodFields" class="form-group hidden">
-                <label for="hodName">HOD Name:</label>
-                <input type="text" id="hodName" name="name" placeholder="Enter your name">
-                <label for="hodDept">HOD Department:</label>
-                <input type="text" id="hodDept" name="department" placeholder="Enter your department">
+                <input type="text" id="hodName" name="name" placeholder="HOD Name">
+                <input type="text" id="hodDept" name="department" placeholder="HOD Department">
             </div>
 
             <!-- HR Fields -->
             <div id="hrFields" class="form-group hidden">
-                <label for="hrName">HR Name:</label>
-                <input type="text" id="hrName" name="name" placeholder="Enter your name">
-                <label for="hrDept">HR Department:</label>
-                <input type="text" id="hrDept" name="department" placeholder="Enter your department">
-                <label for="hrHod">HOD Name:</label>
-                <input type="text" id="hrHod" name="hodName" placeholder="Enter your HOD's name">
-                <label for="currentProjectHR">Current Project:</label>
-                <input type="text" id="currentProjectHR" name="currentProjectHR" placeholder="Enter current project">
+                <input type="text" id="hrName" name="name" placeholder="HR Name">
+                <input type="text" id="hrDept" name="department" placeholder="HR Department">
+                <input type="text" id="hrHod" name="hodName" placeholder="HOD's Name">
+                <input type="text" id="currentProjectHR" name="currentProject" placeholder="Current Project">
             </div>
 
             <!-- Employee Fields -->
             <div id="employeeFields" class="form-group hidden">
-                <label for="empName">Employee Name:</label>
-                <input type="text" id="empName" name="name" placeholder="Enter your name">
-                <label for="empDept">Department:</label>
-                <input type="text" id="empDept" name="department" placeholder="Enter your department">
-                <label for="empHr">HR Name:</label>
-                <input type="text" id="empHr" name="hrName" placeholder="Enter your HR's name">
-                <label for="joiningDate">Joining Date:</label>
-                <input type="date" id="joiningDate" name="joiningDate">
-                <label for="currentProjectEmp">Current Project:</label>
-                <input type="text" id="currentProjectEmp" name="currentProjectEmp" placeholder="Enter current project">
+                <input type="text" id="empName" name="name" placeholder="Employee Name">
+                <input type="text" id="empDept" name="department" placeholder="Department">
+                <input type="text" id="empHr" name="hrName" placeholder="HR's Name">
+                <input type="date" id="joiningDate" name="joiningDate" placeholder="Joining Date">
+                <input type="text" id="currentProjectEmp" name="currentProject" placeholder="Current Project">
             </div>
 
-            <button type="button" id="saveBtn" onclick="saveProfile()">Save</button>
+            <button type="submit" id="saveBtn">Save</button>
         </form>
     </div>
 
@@ -84,65 +68,28 @@
             }
         }
 
-        function saveProfile() {
-            const formData = new FormData(document.getElementById('profileForm'));
-
-            // Extract only one value for designation
-            const designation = formData.get("designation");
-            formData.set("designation", designation);
-
-            // Ensure only one "currentProject" value is sent
-            if (designation === "HR") {
-                formData.set("currentProject", formData.get("currentProjectHR"));
-            } else if (designation === "Employee") {
-                formData.set("currentProject", formData.get("currentProjectEmp"));
-            }
-            formData.delete("currentProjectHR");
-            formData.delete("currentProjectEmp");
-
-            console.log("Form Data:", Array.from(formData.entries())); // ✅ Debugging
-
-            fetch('/save-profile', {
-                method: 'POST',
-                body: new URLSearchParams(formData),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server Response:", data); // ✅ Debugging
-                if (data.success) {
-                    alert(data.message);
-                } else {
-                    alert("Failed to save profile.");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
         function searchData() {
             const searchValue = document.getElementById('searchField').value;
             fetch(`/search-profile?name=${searchValue}`)
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById('searchResult');
-                resultDiv.innerHTML = '';
-                if (data.success) {
-                    resultDiv.innerHTML = `
-                        <h3>Profile Found:</h3>
-                        <p>Name: ${data.data.name}</p>
-                        <p>Department: ${data.data.department}</p>
-                        <p>Current Project: ${data.data.currentProject || 'N/A'}</p>
-                    `;
-                } else {
-                    resultDiv.innerHTML = `<p>Profile not found.</p>`;
-                }
-            })
-            .catch(error => console.error("Error:", error));
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('searchResult');
+                    resultDiv.innerHTML = '';
+                    if (data.success) {
+                        resultDiv.innerHTML = `
+                            <h3>Profile Found:</h3>
+                            <p>Name: ${data.data.name}</p>
+                            <p>Department: ${data.data.department}</p>
+                            <p>Current Project: ${data.data.currentProject || 'N/A'}</p>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `<p>Profile not found.</p>`;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
         }
 
-        window.onload = toggleFields;
+        window.addEventListener('load', toggleFields);
     </script>
 </body>
 </html>
