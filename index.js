@@ -4,7 +4,7 @@ const session = require("express-session");
 const path = require("path");
 
 const Employee = require("./models/employee"); // ✅ Import Employee model
-
+const TransferRequest = require("./models/TransferRequest");
 const app = express();
 
 // Middleware
@@ -225,23 +225,91 @@ app.post('/save-profile', (req, res) => {
             res.status(500).send("Error saving profile.");
         });
 });
+// Save Details Route
 app.post("/save-and-display", (req, res) => {
-    const { designation, name, department, hodName, currentProject, joiningDate } = req.body;
-    
-    // Save the details to your database (example with MongoDB, adjust as needed)
-    const profile = {
-        designation,
+    // Save employee details to database
+    const { name, designation, department, currentProject } = req.body;
+
+    // Store user data in session for future use
+    req.session.user = { 
         name,
+        designation,
         department,
-        hodName,
-        currentProject,
-        joiningDate
+        currentProject
     };
 
-    // After saving, redirect to the Details Saved page with the details
-    res.render("savedDetails", { profile });
+    // Redirect to Dashboard after saving
+    res.redirect("/dashboard");
 });
 
+// Request Transfer Page Route
+app.get('/request-transfer', (req, res) => {
+    const { designation, department } = req.session.user; // Get department from session
+
+    if (designation === 'Employee') {
+        res.render('request-transfer', { 
+            title: 'Request Transfer', 
+            department: department  // Pass department to EJS
+        });
+    } else {
+        res.status(403).send('Only employees can request a transfer.');
+    }
+});
+// Handle Transfer Request Submission
+app.post("/request-transfer", (req, res) => {
+    const newRequest = new TransferRequest({
+        employeeId: req.session.user._id,
+        name: req.session.user.name,
+        currentDept: req.body.currentDept,
+        desiredDept: req.body.desiredDept,
+        reason: req.body.reason
+    });
+
+    newRequest.save()
+        .then(() => {
+            res.redirect("/dashboard");
+        })
+        .catch(err => console.error(err));
+});
+
+// Dashboard Route
+app.get("/dashboard", (req, res) => {
+    if (req.session.user) {
+        res.render("dashboard", {
+            name: req.session.user.name,
+            designation: req.session.user.designation
+        });
+    } else {
+        res.redirect("/login");
+    }
+});
+// Submit Transfer Request Route
+app.post("/submit-transfer-request", (req, res) => {
+    const { currentDepartment, desiredDepartment, reason } = req.body;
+
+    // Save transfer request to database (example structure)
+    const transferRequest = {
+        name: req.session.user.name,
+        currentDepartment,
+        desiredDepartment,
+        reason,
+        status: "Pending"
+    };
+
+    // Save to DB (use your DB logic here)
+    // Example: db.collection('transferRequests').insertOne(transferRequest);
+
+    res.send("Transfer Request Submitted Successfully!");
+});
+app.get('/view-transfer-status', (req, res) => {
+    const { designation } = req.session.user;
+
+    if (designation === 'Employee') {
+        res.render('transfer-status', { title: 'Transfer Status' });
+    } else {
+        res.status(403).send('Only employees can view transfer status.');
+    }
+});
 
 // Start Server
 app.listen(8080, () => {

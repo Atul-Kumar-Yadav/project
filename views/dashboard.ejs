@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+       body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.dashboard-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.logout-button {
+    background-color: #dc3545;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+.footer {
+    margin-top: 20px;
+    color: #888;
+    font-size: 14px;
+}
+ 
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome, <%= name %>!</h1>
+        <h3>Your Designation: <%= designation %></h3>
+    
+        <!-- Navigation Links -->
+        <div class="nav-links">
+            <a href="/view-profile" class="button">View Profile</a>
+            
+            <% if (designation === 'Employee') { %>
+                <a href="/request-transfer" class="button">Request Transfer</a>
+                <a href="/view-transfer-status" class="button">View Transfer Status</a>
+            <% } else { %>
+                <a href="/view-requests" class="button">View Transfer Requests</a>
+            <% } %>
+            
+            <a href="/logout" class="button logout">Logout</a>
+        </div>
+    </div>
+    
+</body>
+</html>

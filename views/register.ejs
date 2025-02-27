@@ -4,13 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    <link rel="stylesheet" href="/register.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        form input, form select {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        form button {
+            width: 100%;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        form button:hover {
+            background: #45a049;
+        }
+        form p {
+            text-align: center;
+            font-size: 13px;
+        }
+        form a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        form a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        function toggleFields() {
+            const role = document.getElementById('role').value;
+            const hrNameField = document.getElementById('hrNameField');
+            const currentProjectField = document.getElementById('currentProjectField');
+
+            if (role === 'employee') {
+                hrNameField.style.display = 'block';
+                currentProjectField.style.display = 'block';
+            } else {
+                hrNameField.style.display = 'none';
+                currentProjectField.style.display = 'none';
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
+        <h2>Register</h2>
         <form action="/register" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
+        
+            <label for="role">Role:</label>
+            <select id="role" name="role" required onchange="toggleFields()">
+                <option value="">Select Role</option>
+                <option value="employee">Employee</option>
+                <option value="hod">HOD</option>
+                <option value="hr">HR</option>
+            </select>
         
             <label for="department">Department:</label>
             <input type="text" id="department" name="department" required>
@@ -18,14 +100,18 @@
             <label for="designation">Designation:</label>
             <input type="text" id="designation" name="designation" required>
         
-            <label for="hrName">HR Name:</label>
-            <input type="text" id="hrName" name="hrName">
+            <div id="hrNameField" style="display: none;">
+                <label for="hrName">HR Name:</label>
+                <input type="text" id="hrName" name="hrName">
+            </div>
+
+            <div id="currentProjectField" style="display: none;">
+                <label for="currentProject">Current Project:</label>
+                <input type="text" id="currentProject" name="currentProject">
+            </div>
         
             <label for="joiningDate">Joining Date:</label>
             <input type="date" id="joiningDate" name="joiningDate">
-        
-            <label for="currentProject">Current Project:</label>
-            <input type="text" id="currentProject" name="currentProject">
         
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
